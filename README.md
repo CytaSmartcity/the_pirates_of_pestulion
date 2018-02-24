@@ -1,1 +1,1 @@
-start
+raw SPA built with http://getbem.com/ methodology
