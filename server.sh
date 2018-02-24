@@ -1,2 +1,2 @@
 #!/bin/bash
-php -S localhost:3000 ./app/index.html
+php -S localhost:3000 -t app/
