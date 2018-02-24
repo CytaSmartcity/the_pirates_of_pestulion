@@ -118,7 +118,29 @@ html, body {
 		background-image: linear-gradient(to bottom, #d4dee1, #a9c0c8);
 		filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#d4dee1, endColorstr=#a9c0c8);
 	}
-	
+
+.b-search {margin: 20px;}
+	.b-search__input {height: 40px;width: 77%;padding: 0 0 0 10px;font-size: 1.5em;vertical-align: middle;}
+	.b-search__submit {height: 40px;width: 70px;margin: 0 0 0 10px;font-size: .9em;vertical-align: middle;color: #666;text-shadow: 1px 1px 1px #fff;
+		cursor: pointer;border: 1px solid #d1dcdf;-webkit-border-radius: 3px;-moz-border-radius: 3px;border-radius: 3px;background-color: #f2f5f6;
+		background-image: -webkit-gradient(linear, left top, left bottom, from(#f2f5f6), to(#c8d7dc));
+		background-image: -webkit-linear-gradient(top, #f2f5f6, #c8d7dc);
+		background-image: -moz-linear-gradient(top, #f2f5f6, #c8d7dc);
+		background-image: -ms-linear-gradient(top, #f2f5f6, #c8d7dc);
+		background-image: -o-linear-gradient(top, #f2f5f6, #c8d7dc);
+		background-image: linear-gradient(to bottom, #f2f5f6, #c8d7dc);
+		filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f2f5f6, endColorstr=#c8d7dc);
+	}
+	.b-search__submit:hover {border: 1px solid #b6c7cc;background-color: #d4dee1;
+		background-image: -webkit-gradient(linear, left top, left bottom, from(#d4dee1), to(#a9c0c8));
+		background-image: -webkit-linear-gradient(top, #d4dee1, #a9c0c8);
+		background-image: -moz-linear-gradient(top, #d4dee1, #a9c0c8);
+		background-image: -ms-linear-gradient(top, #d4dee1, #a9c0c8);
+		background-image: -o-linear-gradient(top, #d4dee1, #a9c0c8);
+		background-image: linear-gradient(to bottom, #d4dee1, #a9c0c8);
+		filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#d4dee1, endColorstr=#a9c0c8);
+	}
+
 	
 .b-switch {position: absolute;z-index: 1300;top: 80px;left: 50%;width: 160px;margin-left: -80px;border: solid 1px #ccc;border-radius: 0 0 10px 10px;}
 	.b-switch__button {float: left;width: 80px;height: 30px;border: none;background: #fff;cursor: pointer;cursor: hand}
