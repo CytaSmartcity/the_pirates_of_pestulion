@@ -118,3 +118,12 @@ html, body {
 		background-image: linear-gradient(to bottom, #d4dee1, #a9c0c8);
 		filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#d4dee1, endColorstr=#a9c0c8);
 	}
+	
+	
+.b-switch {position: absolute;z-index: 1300;top: 80px;left: 50%;width: 160px;margin-left: -80px;border: solid 1px #ccc;border-radius: 0 0 10px 10px;}
+	.b-switch__button {float: left;width: 80px;height: 30px;border: none;background: #fff;cursor: pointer;cursor: hand}
+	.b-switch__button:hover {background: #ccc}
+	.b-switch__button:focus {outline:none;}
+	.b-switch__button_state_current {background: #e2e2e2;}
+	.b-switch__button_type_address {border-radius: 0 0 0 10px;border-right: solid 1px #ccc!important}
+	.b-switch__button_type_route {border-radius: 0 0 10px;}
