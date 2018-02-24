@@ -101,6 +101,14 @@ html, body {height: 100%;width: 100%;font-family: Arial, Verdana}
 	.b-switch__button_type_route {border-radius: 0 0 10px;}
 	
 /* 
+ * TODO move to b-informers 
+ */	
+.b-informers {position: absolute;z-index: 1400;right: 20px;top: 100px;}
+	.b-informers__traffic {width: 90px;height: 30px;}
+	.b-informers__traffic-color {display: block;float: left;margin: 0 3px 0 0;width: 20px;height: 17px;padding-top: 3px;border-radius: 15px;vertical-align: bottom;border: solid 1px #666;background: #666;color: #fff}
+	.b-informers__traffic-ball {display: block;margin-top: 3px}
+	
+/* 
  * TODO move to b-location 
  */
 .b-location {z-index: 1102; position: absolute; top: 100px; left: 120px; width: 18px; height: 20px; padding: 5px 0 0 7px; font-weight: bold; 
@@ -126,7 +134,7 @@ html, body {height: 100%;width: 100%;font-family: Arial, Verdana}
 	.b-found {width: 370px;height: 500px;overflow: auto;}
 		.b-found__item {list-style: none;cursor: pointer;cursor: hand;padding: 10px 0;border-bottom: solid 1px #ccc;vertical-align: center;line-height: 1.5em;}
 		.b-found__item:hover {color: #666}
-		.b-found__item_sprite_routing {display: inline-block; width: 25px; height: 25px; background: url("../../desktop.blocks/b-result/_/i/sprite_routing.png") no-repeat; margin: 0 5px 0 0}
+		.b-found__item_sprite_routing {display: inline-block; width: 25px; height: 25px; background: url("/_/i/sprite_routing.png") no-repeat; margin: 0 5px 0 0}
 		.b-found__item_dir_0 {background-position: 0 0;}
 		.b-found__item_dir_1 {background-position: -25px 0;}
 		.b-found__item_dir_2 {background-position: -50px 0;}
