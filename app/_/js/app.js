@@ -1,4 +1,3 @@
-/* GLOBALS */ 
 ;var debug = true,
 	markers = {}, //markers object
 	route = false, //diable traffic layer
