@@ -10,6 +10,27 @@
 	</head>
 	<body class="page page__body">
 		<div class="b-map"></div>
+		<div class="b-head">
+			<div class="b-head__logo">Map</div>
+			<div class="b-search" style="display: none">
+				<form>
+					<input class="b-search__input" type="text" placeholder="Search on map"/>
+					<input class="b-search__submit" type="submit" value="Find"/>
+				</form>
+			</div>
+			<div class="b-route">
+				<form>
+					<input class="b-route__from" type="text" placeholder="From"/>
+					<input class="b-route__to" type="text" placeholder="To"/>
+					<input class="b-route__submit" type="submit" value="Route"/>
+				</form>
+			</div>
+		</div>
+		<div class="b-head__underlay"></div>
+		<div class="b-switch">
+			<button class="b-switch__button b-switch__button_type_address">Search</button>
+			<button class="b-switch__button b-switch__button_type_route b-switch__button_state_current">Routes</button>
+		</div>
 		
 		<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.0/leaflet.js"></script>
