@@ -36,6 +36,10 @@ function cleanUpResults() {
 	cleanUpRoutes();
 }
 
+function cleanUpFound() {
+	sfound.html('').hide()
+}
+
 function cleanUpMarkers() {
 	for (i in markers) {
 	    map.removeLayer(markers[i]);
@@ -75,10 +79,46 @@ function cleanUpRoutes() {
 	if (debug) console.log('cleanUpRoutes(): ', route);
 }
 
+
 // TODO move to b-search
 var sbutton   =  $('.b-search__submit').click(search),
 	sinput    =  $('.b-search__input'),
-	bounds 	  =  map.getBounds();
+	bounds 	  =  map.getBounds(),
+	autocompleteOptions = {
+		serviceUrl: 'http://search2.tmcrussia.com/',
+		paramName: 'q',
+		dataType: 'json',
+		params: {
+			a: 'suggest', 
+			t: 'addr',
+			bt: 'exact',
+			n: 20,
+			af: 1,
+			lon1: bounds._southWest.lng, 
+			lat1: bounds._southWest.lat, 
+			lon2: bounds._northEast.lng, 
+			lat2: bounds._northEast.lat,
+			z: map.getZoom()
+		},
+		transformResult: function(r) {
+			return {
+				suggestions: $.map(r.res, function(dataItem) {
+					return { 
+						value: dataItem.entity, 
+						data: dataItem 
+					};
+				})
+			};
+		},
+		onSelect: function(r) {
+			// $(this).attr('data-coords', r.data.coord)
+			var _c = r.data.coord,
+				_m = L.marker([_c[1], _c[0]]).addTo(map).on('click', centerByMarker).bindPopup(r.value);
+			markers[this.id] = _m;
+			map.setView(_m.getLatLng(), map.getZoom());
+		}
+	};
+sinput.autocomplete(autocompleteOptions);
 	
 // Search section
 function search(e) {
@@ -93,7 +133,7 @@ function search(e) {
 		console.log('map.getBounds():', bounds); //@deprecated
 		console.log('map.getCenter():', center);
 	}
-	if (string == '' || string.length<3) {
+	if (string == '' || string.length<36) {
 		alert('Enter the address!');
 		return;
 	}
@@ -155,10 +195,170 @@ function search(e) {
 		if (debug) console.log('Search $.ajax.always(): ', r);
 	});	
 }
-	
-	function cleanUpFound() {
-		sfound.html('').hide()
+
+
+// TODO move to b-route
+var rfrom = $('.b-route__from'),
+	rto = $('.b-route__to'),
+	rbutton = $('.b-route__submit').click(routing),
+	rmaneuvres = [
+		'straihght',
+		'lefter',
+		'left',
+		'hard left',
+		'righter',
+		'right',
+		'hard right',
+		'turn around',
+		'roundabout',
+		'turn left',
+		'turn right'
+	],
+	icon = L.icon({
+	    iconUrl: '_/i/circle.svg',
+	 	iconAnchor: [10, 10],
+	});
+// console.log(autocompleteOptions)
+rfrom.autocomplete(autocompleteOptions);
+rto.autocomplete(autocompleteOptions);
+
+// Routing section
+function routing(e) {
+	var from = rfrom.val(),
+		to = rto.val(),
+		counter = 0,
+		center = map.getCenter(),
+		coords = {
+			from: '',
+			to: ''
+		};
+	if (e) {
+		e.stopPropagation();
+		e.preventDefault();
 	}
+	if (from == '' || from.length < 4) {
+		state.route = false;
+		alert('Enter destination point!');
+		return;
+	}
+	if (to == '' || to.length < 4) {
+		state.route = false;
+		alert('Enter the start point!');
+		return;
+	}
+	state.route = true; //[from, to];
+	
+	$.ajax({
+		type: 'GET',
+		dataType: 'json',
+		url: 'http://search2.tmcrussia.com/',
+		data: {
+			a: 'georoute',
+			q1: from,
+			q2: to,
+			gn: 2,
+			type: 'route,plan,indexes',
+			method: 'optimal',
+			traffic: (state.traffic == true) ? 1 : 0,
+			z: map.getZoom(),
+			um: true
+		},
+		beforeSend: function() {
+			lwait.show();
+		}
+	}).done(function(r) {
+		var _points = r.res.route.points,
+			_time = new Date(1970, 1, 1, 0, 0, parseInt(r.res.route.time), 0)
+					.toTimeString()
+					.replace(/^(\d{2}):(\d{2}):(\d{2}).*/, "$1:$2 min")
+					.replace(/^00:(.*)/, "$1"),
+			_distance = (r.res.route.distance/1000)
+						.toString()
+						.replace(/(\d+).(\d+)/, "$1км $2м")
+						.replace(/^0км (.*)/, "$1"),
+			_plan = r.res.route.plan,
+			_inj = $('<div/>', {
+				'class': 'b-meta',
+				html: $('<div/>',{
+						'class': 'b-meta__time',
+						text: 'Time of trip: ' + _time
+					}).add($('<div/>',{
+						'class': 'b-meta__distance',
+						text: 'Distance: ' + _distance
+					}))
+			}),
+			_injPlan = $('<ul/>').attr({'class': 'b-found'}),
+			_st = r.res.search[0][0].matches[0],
+			_fn = r.res.search[1][0].matches[0],
+			_r = [],
+			_p = [],
+			bounds, ne, sw;
+		cleanUpResults(); // state.route == true ? true : false 
+
+		// reverse  shit
+		for (var i = 0; i < _points.length; i++) {
+			_r.push([_points[i][1], _points[i][0]]);
+		}
+		//end of freverse
+		
+		for (var i = 0; i < _plan.length; i++) {
+			if (_plan[i]['name'] != '') {
+				var _crds = [_plan[i].from[1], _plan[i].from[0]];
+				if (i!=0 && i!=_plan.length) {
+					markers[i] = L.marker(_crds, {icon: icon}).addTo(map).on('click', centerByMarker).bindPopup(_plan[i]['name']);
+				}
+				
+				$('<li/>', {
+					'data-marker': i, 
+					'class': 'b-found__item',
+					html: $('<div/>',{
+						'class': 'b-found__item_sprite_routing b-found__item_dir_' + _plan[i]['dir'],
+						html: '&nbsp;'
+					}),
+					click: centerByFound
+				})
+				.append(_plan[i]['name'])
+				.appendTo(_injPlan);
+			}
+		}
+		route = {
+			start: L.marker([_st.y, _st.x]).addTo(map).on('click', centerByMarker).bindPopup(_st.addr),
+			end: L.marker([_fn.y, _fn.x]).addTo(map).on('click', centerByMarker).bindPopup(_fn.addr),
+			line: L.polyline(_r, {
+				color: 'purple',
+				stroke: true 
+			}).addTo(map)
+		}
+		
+		/* check this OUT! diff behaviour */
+		bounds = route.line.getBounds();
+		//start bar excluding trick
+		ne = map.project(bounds.getNorthEast());
+		ne.y -= 80; //bar offset
+		sw = map.project(bounds.getSouthWest());
+		sw.x -= 160; //result offset
+		ne = map.unproject(ne);
+		sw = map.unproject(sw)
+		bounds = new L.LatLngBounds(sw, ne);
+		//end bar excluding trick
+		map.fitBounds(bounds);
+
+		sfound.html(_inj);
+		_injPlan.insertAfter(_inj);
+		sfound.show()
+		
+	}).fail(function() {
+		if (debug) console.log('ROUTE ajax ERROR!');
+	}).always(function(r) {
+		if (sresult.not(':visible')) {
+			sresult.show('slow');
+			sunderlay.show('slow');
+		}
+		lwait.hide();
+		if (debug) console.log('ROUTE $.ajax.always(): ', r);
+	});
+}
+	
 
 // TODO move to b-traffic 
 var ctraffic  =  $('.b-informers__traffic').click(enableTraffic),
