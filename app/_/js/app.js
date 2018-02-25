@@ -474,10 +474,12 @@ function closeResults(e) {
 /*
  *  OSM traffic lights 
  */
-
+var trafBbox = map.getBounds();
 for(i in _osm_traffic_lights) {
 	var _c = _osm_traffic_lights[i].coordinates,
-		_m = L.marker([_c[1], _c[0]]).addTo(map).on('click', centerByMarker).bindPopup(_c[1]+', '+_c[0]);
-	markers.push(_m);
-	// console.log(_osm_traffic_lights[i])
+		_l = L.latLng(_c[1], _c[0]);
+	// console.log(_l)
+	if (trafBbox.contains(_l) == true)
+		markers.push(L.marker(_l).addTo(map).on('click', centerByMarker).bindPopup(_c[1]+', '+_c[0]));
+	
 }
