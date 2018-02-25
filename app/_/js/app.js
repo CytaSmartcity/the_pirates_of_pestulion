@@ -1,6 +1,7 @@
 // TODO move to b-map
 ;var debug = true,
 	markers = [], //markers object
+	lights = [],
 	route = false, //diable traffic layer
 	traffic, //traffic layer
 	map = new L.map($('.b-map').get(0), {minZoom: 1, maxZoom: 17}).setView([37.983972,23.727806], 17), //map object
@@ -47,6 +48,12 @@ function cleanUpMarkers() {
 	markers = [];
 	if (debug) console.log('cleanUpMarkers(): ', markers);
 }
+function cleanUpLightsMarkers() {
+	for (i in lights) {
+	    map.removeLayer(lights[i]);
+	}
+	lights = [];	
+}
 
 // TODO move to b-controls
 var bsearch   =  $('.b-search'),
@@ -84,36 +91,37 @@ function cleanUpRoutes() {
 var sbutton   =  $('.b-search__submit').click(search),
 	sinput    =  $('.b-search__input'),
 	bounds 	  =  map.getBounds(),
+	center    = map.getCenter(),
 	autocompleteOptions = {
-		serviceUrl: 'http://search2.tmcrussia.com/',
+		serviceUrl: 'http://api.geonames.org/searchJSON', 
 		paramName: 'q',
 		dataType: 'json',
 		params: {
-			a: 'suggest', 
-			t: 'addr',
-			bt: 'exact',
-			n: 20,
-			af: 1,
-			lon1: bounds._southWest.lng, 
-			lat1: bounds._southWest.lat, 
-			lon2: bounds._northEast.lng, 
-			lat2: bounds._northEast.lat,
-			z: map.getZoom()
+			south: bounds._southWest.lat, 
+			north: bounds._northEast.lat,
+			west: bounds._southWest.lng,
+			east: bounds._northEast.lng,
+			maxRows: 10,
+			username: 'mamyashev',
+			searchlang: 'en',
+			lat: center.lat, 
+			lon: center.lng
 		},
 		transformResult: function(r) {
-			return {
-				suggestions: $.map(r.res, function(dataItem) {
-					return { 
-						value: dataItem.entity, 
-						data: dataItem 
-					};
-				})
-			};
+			if (r.totalResultsCount > 0) {
+				return {
+					suggestions: $.map(r.geonames, function(dataItem) {
+						return { 
+							value: dataItem.name, 
+							data: dataItem 
+						};
+					})
+				};
+			}
 		},
 		onSelect: function(r) {
 			// $(this).attr('data-coords', r.data.coord)
-			var _c = r.data.coord,
-				_m = L.marker([_c[1], _c[0]]).addTo(map).on('click', centerByMarker).bindPopup(r.value);
+			var _m = L.marker([r.data.lat, r.data.lng]).addTo(map).on('click', centerByMarker).bindPopup(r.name);
 			markers[this.id] = _m;
 			map.setView(_m.getLatLng(), map.getZoom());
 		}
@@ -474,15 +482,22 @@ function closeResults(e) {
 /*
  *  OSM traffic lights 
  */
+var iconb64 = 'data:image/png;base64,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'
+
+var icon = L.icon({
+	iconUrl: iconb64,
+	iconSize: [20, 20]
+});
+
 function redrawLights () {
 	var lightsBbox = map.getBounds();
 	if (markers.length>0) 
-		cleanUpMarkers();
+		cleanUpLightsMarkers();
 	for(i in _osm_traffic_lights) {
 		var _c = _osm_traffic_lights[i].coordinates,
 			_l = L.latLng(_c[1], _c[0]);
 		if (lightsBbox.contains(_l) == true)
-			markers.push(L.marker(_l).addTo(map).on('click', centerByMarker).bindPopup(_c[1]+', '+_c[0]));
+			lights.push(L.marker(_l, {icon: icon}).addTo(map).on('click', centerByMarker).bindPopup(_c[1]+', '+_c[0]));
 	
 	}
 }
