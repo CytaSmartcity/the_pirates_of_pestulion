@@ -1,9 +1,9 @@
 // TODO move to b-map
 ;var debug = true,
-	markers = {}, //markers object
+	markers = [], //markers object
 	route = false, //diable traffic layer
 	traffic, //traffic layer
-	map = new L.map($('.b-map').get(0), {minZoom: 1, maxZoom: 17}).setView([37.983972,23.727806], 9), //map object
+	map = new L.map($('.b-map').get(0), {minZoom: 1, maxZoom: 17}).setView([37.983972,23.727806], 17), //map object
 	state = {
 		traffic: false, //traffic layer flag
 		informer: false, //traffic informer flag
@@ -44,7 +44,7 @@ function cleanUpMarkers() {
 	for (i in markers) {
 	    map.removeLayer(markers[i]);
 	}
-	markers = {};
+	markers = [];
 	if (debug) console.log('cleanUpMarkers(): ', markers);
 }
 
@@ -469,4 +469,15 @@ function closeResults(e) {
 	sunderlay.hide('slow');
 	// center offset trick by result
 	map.panBy([170, 0]);
+}
+
+/*
+ *  OSM traffic lights 
+ */
+
+for(i in _osm_traffic_lights) {
+	var _c = _osm_traffic_lights[i].coordinates,
+		_m = L.marker([_c[1], _c[0]]).addTo(map).on('click', centerByMarker).bindPopup(_c[1]+', '+_c[0]);
+	markers.push(_m);
+	// console.log(_osm_traffic_lights[i])
 }
